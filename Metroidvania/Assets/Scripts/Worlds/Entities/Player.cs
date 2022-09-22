@@ -20,6 +20,9 @@ public class Player : Entity
     public GameObject obj7;
     public GameObject obj8;
 
+    public bool isInitPlayer => m_initPlayer;
+    private bool m_initPlayer = false;
+
     public void Test()
     {
         obj1.transform.position = hPos;
@@ -633,6 +636,8 @@ public class Player : Entity
         // TODO: ApplyFile은 테스트할 때만 사용하고, 본 스크립트의 초기값을 설정하고, InitGraphs() 함수만 수행하도록 한다.
         // InitGraphs();
         ApplyFile();
+
+        m_initPlayer = true;
     }
 
     public void InitGraphs()
@@ -688,6 +693,7 @@ public class Player : Entity
     private void Enter_IdleGround()
     {
         DisableGravity();
+        canUpdateLookDir = true;
 
         proceedIdleGroundFrame = 0;
 
@@ -770,6 +776,7 @@ public class Player : Entity
     private void Enter_IdleGroundLong()
     {
         DisableGravity();
+        canUpdateLookDir = true;
     }
 
     private void Input_IdleGroundLong()
@@ -798,6 +805,7 @@ public class Player : Entity
     private void Enter_HeadUp()
     {
         DisableGravity();
+        canUpdateLookDir = false;
         proceedHeadUpFrame = 0;
     }
 
@@ -829,6 +837,7 @@ public class Player : Entity
     private void Enter_Sit()
     {
         DisableGravity();
+        canUpdateLookDir = false;
         proceedSitFrame = 0;
         currentSitGround = detectedGround;
     }
@@ -866,6 +875,7 @@ public class Player : Entity
     private void Enter_Walk()
     {
         EnableGravity();
+        canUpdateLookDir = true;
     }
 
     private void Input_Walk()
@@ -903,6 +913,7 @@ public class Player : Entity
     private void Enter_Run()
     {
         EnableGravity();
+        canUpdateLookDir = true;
     }
 
     private void Input_Run()
@@ -940,6 +951,7 @@ public class Player : Entity
     private void Enter_FreeFall()
     {
         EnableGravity();
+        canUpdateLookDir = true;
 
         if(currentVelocity.y > 0.0f)
         {
@@ -997,9 +1009,9 @@ public class Player : Entity
             machine.ChangeState(stGliding);
         else if(inputData.xInput == lookDir)
         {
-            if(isHitLedgeHead)
+            if(isHitLedgeHead && isHitWallT == lookDir)
                 machine.ChangeState(stLedgeClimbHead);
-            else if(isHitLedgeBody)
+            else if(isHitLedgeBody && isHitWallT == lookDir)
                 machine.ChangeState(stLedgeClimbBody);
             else if(!isDetectedGround && inputData.yNegative == 0 && isHitWallB == lookDir && isHitWallT == lookDir)
                 machine.ChangeState(stIdleWall);
@@ -1026,6 +1038,7 @@ public class Player : Entity
     private void Enter_Gliding()
     {
         EnableGravity();
+        canUpdateLookDir = true;
 
         if(Mathf.Abs(currentVelocity.x) == 0.0f)
         {
@@ -1097,9 +1110,9 @@ public class Player : Entity
             machine.ChangeState(stFreeFall);
         else if(inputData.xInput == lookDir)
         {
-            if(isHitLedgeHead)
+            if(isHitLedgeHead && isHitWallT == lookDir)
                 machine.ChangeState(stLedgeClimbHead);
-            else if(isHitLedgeBody)
+            else if(isHitLedgeBody && isHitWallT == lookDir)
                 machine.ChangeState(stLedgeClimbBody);
             else if(!isDetectedGround && inputData.yNegative == 0 && isHitWallB == lookDir && isHitWallT == lookDir)
                 machine.ChangeState(stIdleWall);
@@ -1143,6 +1156,8 @@ public class Player : Entity
     private void Enter_IdleWall()
     {
         DisableGravity();
+        canUpdateLookDir = true;
+
         leftJumpAirCount = jumpAirCount;
         leftDashCount = dashCount;
 
@@ -1197,6 +1212,8 @@ public class Player : Entity
     private void Enter_WallSliding()
     {
         EnableGravity();
+        canUpdateLookDir = true;
+
         proceedWallSlidingFrame = 0;
     }
 
@@ -1227,6 +1244,7 @@ public class Player : Entity
     private void Enter_LedgeClimbHead()
     {
         DisableGravity();
+        canUpdateLookDir = false;
 
         Vector2 sidePos = Vector2.zero;
         Vector2 handDir = Vector2.zero;
@@ -1288,6 +1306,7 @@ public class Player : Entity
     private void Enter_LedgeClimbBody()
     {
         DisableGravity();
+        canUpdateLookDir = false;
 
         Vector2 sidePos = Vector2.zero;
         Vector2 handDir = Vector2.zero;
@@ -1349,6 +1368,7 @@ public class Player : Entity
     private void Enter_JumpGround()
     {
         EnableGravity();
+        canUpdateLookDir = true;
 
         leftJumpGroundCount--;
         leftJumpGroundFrame = jumpGroundFrame;
@@ -1381,9 +1401,9 @@ public class Player : Entity
             machine.ChangeState(stDash);
         else if(inputData.xInput == lookDir)
         {
-            if(isHitLedgeHead)
+            if(isHitLedgeHead && isHitWallT == lookDir)
                 machine.ChangeState(stLedgeClimbHead);
-            else if(isHitLedgeBody)
+            else if(isHitLedgeBody && isHitWallT == lookDir)
                 machine.ChangeState(stLedgeClimbBody);
             else if(!isDetectedGround && inputData.yNegative == 0 && isHitWallB == lookDir && isHitWallT == lookDir)
                 machine.ChangeState(stIdleWall);
@@ -1406,9 +1426,9 @@ public class Player : Entity
     private void Enter_JumpDown()
     {
         EnableGravity();
+        canUpdateLookDir = true;
 
         leftJumpDownFrame = jumpDownFrame;
-
         IgnoreCollision(currentSitGround.collider);
     }
 
@@ -1417,6 +1437,8 @@ public class Player : Entity
         if(leftJumpDownFrame == 0 || isHitCeil) machine.ChangeState(stFreeFall);
 
         // if(isHitCeil) machine.ChangeState(stFreeFall);
+        else if(isHitGround && detectedGround.collider != currentSitGround.collider)
+            machine.ChangeState(stIdleGround);
         else if(Array.Exists<RaycastHit2D>(headOverSemiGroundCurrents, (element) => element.collider == currentSitGround.collider && element.distance >= 0.1f))
             machine.ChangeState(stFreeFall);
     }
@@ -1451,6 +1473,7 @@ public class Player : Entity
     private void Enter_Roll()
     {
         EnableGravity();
+        canUpdateLookDir = false;
         leftRollStartFrame = rollStartFrame;
         leftRollInvincibilityFrame = 0;
         leftRollWakeUpFrame = 0;
@@ -1517,6 +1540,7 @@ public class Player : Entity
     private void Enter_JumpAir()
     {
         DisableGravity();
+        canUpdateLookDir = true;
         leftJumpAirCount--;
         leftJumpAirIdleFrame = jumpAirIdleFrame;
         leftJumpAirFrame = 0;
@@ -1549,9 +1573,9 @@ public class Player : Entity
             machine.ChangeState(stDash);
         else if(inputData.xInput == lookDir)
         {
-            if(isHitLedgeHead)
+            if(isHitLedgeHead && isHitWallT == lookDir)
                 machine.ChangeState(stLedgeClimbHead);
-            else if(isHitLedgeBody)
+            else if(isHitLedgeBody && isHitWallT == lookDir)
                 machine.ChangeState(stLedgeClimbBody);
             else if(!isDetectedGround && inputData.yNegative == 0 && isHitWallB == lookDir && isHitWallT == lookDir)
                 machine.ChangeState(stIdleWall);
@@ -1585,6 +1609,7 @@ public class Player : Entity
     private void Enter_Dash()
     {
         DisableGravity();
+        canUpdateLookDir = false;
         leftDashCount--;
         leftDashIdleFrame = dashIdleFrame;
         leftDashInvincibilityFrame = 0;
@@ -1597,9 +1622,9 @@ public class Player : Entity
             machine.ChangeState(stFreeFall);
         else if(inputData.xInput == lookDir)
         {
-            if(isHitLedgeHead)
+            if(isHitLedgeHead && isHitWallT == lookDir)
                 machine.ChangeState(stLedgeClimbHead);
-            else if(isHitLedgeBody)
+            else if(isHitLedgeBody && isHitWallT == lookDir)
                 machine.ChangeState(stLedgeClimbBody);
             else if(!isDetectedGround && inputData.yNegative == 0 && isHitWallB == lookDir && isHitWallT == lookDir)
                 machine.ChangeState(stIdleWall);
@@ -1633,6 +1658,8 @@ public class Player : Entity
     #region Implement State; stTakeDown
     private void Enter_TakeDown()
     {
+        canUpdateLookDir = false;
+
         leftTakeDownAirIdleFrame = takeDownAirIdleFrame;
         leftTakeDownLandingIdleFrame = 0;
         isTakeDownAirIdleEnded = false;
@@ -1705,6 +1732,7 @@ public class Player : Entity
     private void Enter_JumpWall()
     {
         EnableGravity();
+        canUpdateLookDir = false;
         leftJumpWallForceFrame = jumpWallForceFrame;
         leftJumpWallFrame = jumpWallFrame;
         jumpWallLookDir = -lookDir;
@@ -1737,9 +1765,9 @@ public class Player : Entity
             }
             else if(inputData.xInput == lookDir)
             {
-                if(isHitLedgeHead)
+                if(isHitLedgeHead && isHitWallT == lookDir)
                     machine.ChangeState(stLedgeClimbHead);
-                else if(isHitLedgeBody)
+                else if(isHitLedgeBody && isHitWallT == lookDir)
                     machine.ChangeState(stLedgeClimbBody);
                 else if(!isDetectedGround && inputData.yNegative == 0 && isHitWallB == lookDir && isHitWallT == lookDir)
                     machine.ChangeState(stIdleWall);
@@ -1753,7 +1781,7 @@ public class Player : Entity
             }
             if(inputData.xInput != 0 && !isJumpWallCanceledX)
             {
-                isJumpWallCanceledXY = true;
+                isJumpWallCanceledX = true;
             }
         }
     }

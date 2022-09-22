@@ -2,12 +2,17 @@ using UnityEngine;
 
 public abstract class Manager : MonoBehaviour
 {
-    private void OnEnable()
+    protected virtual void OnEnable()
     {
         SetManager();
     }
 
-    private void OnDestroy()
+    protected virtual void Start()
+    {
+
+    }
+
+    protected virtual void OnDestroy()
     {
         ResetManager();
     }
