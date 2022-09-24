@@ -4,6 +4,8 @@ public abstract class AI
 {
     public bool isCaptured => m_captured;
     public bool isPulsed => m_pulsed;
+    public float currentX => m_cpx;
+    public float currentY => m_cpy;
     public float capturedX => m_px;
     public float capturedY => m_py;
 
@@ -15,6 +17,9 @@ public abstract class AI
 
     private RandomPulse m_rp;
     private bool m_pulsed;
+
+    private float m_cpx;
+    private float m_cpy;
 
     private bool m_captured;
     private float m_px;
@@ -29,9 +34,12 @@ public abstract class AI
         m_rp = new RandomPulse(prng, pulseAverage, pulseRange);
     }
 
-    public void UpdateLogic()
+    public void UpdateLogic(float cpx, float cpy)
     {
         m_rp.UpdateLogic();
+
+        m_cpx = cpx;
+        m_cpy = cpy;
 
         if(!m_rp.isEnabled)
             m_pulsed = false;

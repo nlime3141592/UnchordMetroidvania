@@ -143,7 +143,7 @@ public class PassiveEntity : MonoBehaviour
         else Debug.Log("AI Not Captured Player.");
 
         // Update AI
-        m_ai.UpdateLogic();
+        m_ai.UpdateLogic(transform.position.x, transform.position.y);
 
         // Check AI pulsed
         if(m_ai.isPulsed) Debug.Log("AI Pulsed.");
