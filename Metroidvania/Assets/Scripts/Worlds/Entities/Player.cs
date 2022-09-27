@@ -179,14 +179,14 @@ public class Player : Entity
     public float runSpeed = 7.0f;
 
     // stFreeFall options
-    public float maxFreeFallSpeed = 12.0f;
+    public float maxFreeFallSpeed = 18.0f;
     public int freeFallFrame = 39;
     private DiscreteGraph freeFallGraph;
     private int proceedFreeFallFrame;
     public int preInputFrameFreeFall;
 
     // stGliding options
-    public float glidingSpeed = 0.05f;
+    public float glidingSpeed = 0.8f;
     public int glidingAccelFrameX = 39;
     public int glidingDeaccelFrameX = 26;
     private DiscreteGraph glidingAccelGraphX;
@@ -210,7 +210,7 @@ public class Player : Entity
 
     // stJumpGround options
     public int jumpGroundCount = 1;
-    public float jumpGroundSpeed = 5.5f;
+    public float jumpGroundSpeed = 12.0f;
     public int jumpGroundFrame = 18;
     private DiscreteGraph jumpGroundGraph;
     private int leftJumpGroundCount;
@@ -224,7 +224,7 @@ public class Player : Entity
     private int leftJumpDownFrame;
 
     // stRoll options
-    public float rollSpeed = 9.5f;
+    public float rollSpeed = 20.0f;
     public int rollStartFrame = 6;
     public int rollInvincibilityFrame = 18;
     public int rollWakeUpFrame = 6;
@@ -237,7 +237,7 @@ public class Player : Entity
 
     // stJumpAir options
     public int jumpAirCount = 1;
-    public float jumpAirSpeed = 7.5f;
+    public float jumpAirSpeed = 16.0f;
     public int jumpAirIdleFrame = 3;
     public int jumpAirFrame = 20;
     private DiscreteGraph jumpAirGraph;
@@ -248,7 +248,7 @@ public class Player : Entity
 
     // stDash options
     public int dashCount = 1;
-    public float dashSpeed = 36.0f;
+    public float dashSpeed = 72.0f;
     public int dashIdleFrame = 6;
     public int dashInvincibilityFrame = 9;
     private DiscreteGraph dashGraph;
@@ -260,16 +260,16 @@ public class Player : Entity
     // stTakeDown options
     public float takeDownSpeed = 48.0f;
     public int takeDownAirIdleFrame = 18;
-    public int takeDownLandingIdleFrame = 12;
+    public int takeDownLandingIdleFrame = 24;
     private int leftTakeDownAirIdleFrame;
     private int leftTakeDownLandingIdleFrame;
     private bool isTakeDownAirIdleEnded;
     private bool isLandingAfterTakeDown;
 
     // stJumpWall options
-    public float jumpWallSpeedX = 7.0f;
-    public float jumpWallSpeedY = 10.0f;
-    public int jumpWallFrame = 13;
+    public float jumpWallSpeedX = 12.0f;
+    public float jumpWallSpeedY = 16.0f;
+    public int jumpWallFrame = 18;
     public int jumpWallForceFrame = 6;
     private DiscreteGraph jumpWallGraphX;
     private DiscreteGraph jumpWallGraphY;
@@ -1872,13 +1872,21 @@ public class Player : Entity
             UnityWinAPI.Exit();
         }
 
-        transform.position = initialPosition;
+        // transform.position = initialPosition;
+        transform.position = new Vector3(2, 3, transform.position.z);
     }
 
     public void OpenExplorer()
     {
         string path = Application.persistentDataPath.Replace("/", "\\");
         UnityWinAPI.OpenExplorer(path);
+    }
+
+    public void CreateFile()
+    {
+        string path = Application.persistentDataPath + "/DataTable.txt";
+
+        PlayerExtensions.CreateDataTable(path);
     }
     #endregion
 }

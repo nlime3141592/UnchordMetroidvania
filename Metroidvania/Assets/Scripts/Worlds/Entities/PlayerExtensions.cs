@@ -10,6 +10,11 @@ public static class PlayerExtensions
         if(File.Exists(path))
             return;
 
+        PlayerExtensions.CreateDataTable(path);
+    }
+
+    public static void CreateDataTable(string path)
+    {
         Action createFile = () =>
         {
             using(FileStream stream = new FileStream(path, FileMode.Create))
@@ -34,7 +39,7 @@ public static class PlayerExtensions
 isRun: run
 longIdleTransitionFrame: 900
 
-walkSpeed: 5.0
+walkSpeed: 3.5
 runSpeed: 7.0
 
 maxFreeFallSpeed: 18.0
@@ -65,13 +70,13 @@ jumpAirIdleFrame: 3
 jumpAirFrame: 18
 
 dashCount: 1
-dashSpeed: 72
+dashSpeed: 72.0
 dashIdleFrame: 6
 dashInvincibilityFrame: 9
 
 takeDownSpeed: 48
 takeDownAirIdleFrame: 18
-takeDownLandingIdleFrame: 12
+takeDownLandingIdleFrame: 24
 
 jumpWallSpeedX: 12
 jumpWallSpeedY: 16

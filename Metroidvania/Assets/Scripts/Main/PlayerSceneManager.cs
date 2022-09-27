@@ -38,6 +38,11 @@ public class PlayerSceneManager : Manager
         MapManager.Open(2, true, onOpen);
     }
 
+    protected override void Update()
+    {
+        QuitApp();
+    }
+
     protected override void SetManager()
     {
         ManagerHub.SetPlayerSceneManager(this);
@@ -92,5 +97,16 @@ public class PlayerSceneManager : Manager
 
         Task outTask = new Task(outAction, "out");
         outTask.Start();
+    }
+
+    private void QuitApp()
+    {
+        if(Input.GetKeyDown(KeyCode.Escape))
+            Application.Quit();
+    }
+
+    public void QuitApplication()
+    {
+        Application.Quit();
     }
 }
