@@ -1040,62 +1040,29 @@ public class Player : Entity
         EnableGravity();
         canUpdateLookDir = true;
 
-        if(Mathf.Abs(currentVelocity.x) == 0.0f)
-        {
-            leftGlidingDeaccelFrameX = 0;
-            proceedGlidingAccelFrameX = 0;
-        }
-        else if(Mathf.Abs(currentVelocity.x) > GetMoveSpeed())
-        {
-            if(inputData.xInput == 0)
-            {
-                leftGlidingDeaccelFrameX = glidingDeaccelFrameX;
-                proceedGlidingAccelFrameX = 0;
-            }
-            else
-            {
-                leftGlidingDeaccelFrameX = 0;
-                proceedGlidingAccelFrameX = glidingAccelFrameX;
-            }
-        }
-        else
-        {
-            float tx = Mathf.Abs(currentVelocity.x);
+        float tx = Mathf.Abs(currentVelocity.x);
+        float sp = GetMoveSpeed();
+        int lf = 0;
+        int pf = 0;
+        int aix = Mathf.Abs(inputData.xInput);
+        DiscreteGraph gAcc = glidingAccelGraphX;
+        DiscreteGraph gDacc = glidingDeaccelGraphX;
+        int maxAcc = glidingAccelFrameX;
+        int maxDacc = glidingDeaccelFrameX;
 
-            if(tx > glidingSpeed)
-            {
-                leftGlidingDeaccelFrameX = glidingDeaccelFrameX;
-                proceedGlidingAccelFrameX = glidingAccelFrameX;
-            }
-            else if(inputData.xInput == 0)
-            {
-                for(int i = 0; i < glidingDeaccelFrameX; i++)
-                {
-                    if(Mathf.Abs(currentVelocity.x) >= glidingDeaccelGraphX[i] * glidingSpeed)
-                    {
-                        leftGlidingDeaccelFrameX = i;
-                        proceedGlidingAccelFrameX = glidingAccelFrameX;
-                        while(proceedGlidingAccelFrameX > 0 &&  glidingAccelGraphX[proceedGlidingAccelFrameX - 1] > glidingDeaccelGraphX[leftGlidingDeaccelFrameX])
-                            proceedGlidingAccelFrameX--;
-                        break;
-                    }
-                }
-            }
-            else
-            {
-                for(int i = 0; i < glidingAccelFrameX; i++)
-                {
-                    if(Mathf.Abs(currentVelocity.x) >= glidingAccelGraphX[i] * glidingSpeed)
-                    {
-                        proceedGlidingAccelFrameX = i;
-                        leftGlidingDeaccelFrameX = 0;
-                        while(leftGlidingDeaccelFrameX < glidingDeaccelFrameX && glidingDeaccelGraphX[leftGlidingDeaccelFrameX] < glidingAccelGraphX[proceedGlidingAccelFrameX])
-                            leftGlidingDeaccelFrameX++;
-                        break;
-                    }
-                }
-            }
+        if(tx >= sp)
+        {
+            lf = maxDacc * (1 - aix);
+            pf = maxAcc * aix;
         }
+        else if(tx > 0)
+        {
+            while(lf < maxDacc && tx / sp < gDacc[lf]) lf++;
+            while(pf < maxAcc && tx / sp < gAcc[pf]) pf++;
+        }
+
+        leftGlidingDeaccelFrameX = lf;
+        proceedGlidingAccelFrameX = pf;
     }
 
     private void Input_Gliding()
@@ -1121,33 +1088,42 @@ public class Player : Entity
 
     private void Logic_Gliding()
     {
+        vx = currentVelocity.x;
         vy = -glidingSpeed;
+        float tx = currentVelocity.x;
+        DiscreteGraph gAcc = glidingAccelGraphX;
+        DiscreteGraph gDacc = glidingDeaccelGraphX;
+        int lf = leftGlidingDeaccelFrameX;
+        int pf = proceedGlidingAccelFrameX;
+        int ix = inputData.xInput;
+        float sp = GetMoveSpeed();
+        int maxAcc = glidingAccelFrameX;
+        int maxDacc = glidingDeaccelFrameX;
 
-        if(currentVelocity.x * inputData.xInput < 0.0f) // 방향전환 확인
-        {
+        if(tx * ix < 0.0f)
             vx *= -1.0f;
-        }
-        else if(inputData.xInput == 0)
+        else if(ix == 0)
         {
-            if(leftGlidingDeaccelFrameX > 0)
-                leftGlidingDeaccelFrameX--;
-
-            while(proceedGlidingAccelFrameX > 0 &&  glidingAccelGraphX[proceedGlidingAccelFrameX - 1] > glidingDeaccelGraphX[leftGlidingDeaccelFrameX])
-                proceedGlidingAccelFrameX--;
-
-            vx = CheckVelocityX(GetMoveSpeed() * glidingDeaccelGraphX[leftGlidingDeaccelFrameX] * lookDir);
+            if(lf > 0) lf--;
+            while(pf > 0 && gAcc[pf - 1] > gDacc[lf]) pf--;
+            vx = CheckVelocityX(sp * gDacc[lf] * lookDir);
         }
-        else if(inputData.xInput != 0)
+        else if(ix != 0)
         {
-            if(proceedGlidingAccelFrameX < glidingAccelFrameX)
-                proceedGlidingAccelFrameX++;
-
-            while(leftGlidingDeaccelFrameX < glidingDeaccelFrameX && glidingDeaccelGraphX[leftGlidingDeaccelFrameX] < glidingAccelGraphX[proceedGlidingAccelFrameX - 1])
-                leftGlidingDeaccelFrameX++;
-
-            vx = CheckVelocityX(GetMoveSpeed() * glidingAccelGraphX[proceedGlidingAccelFrameX - 1] * lookDir);
+            try
+            {
+                if(pf < maxAcc) pf++;
+                while(lf < maxDacc && gDacc[lf] < gAcc[pf - 1]) lf++;
+                vx = CheckVelocityX(sp * gAcc[pf - 1] * lookDir);
+            }
+            catch(Exception)
+            {
+                Debug.Log(string.Format("Error pf: {0}", pf));
+            }
         }
 
+        leftGlidingDeaccelFrameX = lf;
+        proceedGlidingAccelFrameX = pf;
         SetVelocityXY(vx, vy);
     }
     #endregion
