@@ -666,6 +666,9 @@ public class Player : Entity
         animator.SetInteger("currentState", machine.state);
         // UnityEngine.Debug.Log(string.Format("current state: {0}", machine.state));
         CRST = machine.state;
+
+        if(Input.GetKeyDown(KeyCode.LeftControl))
+            isRun = !isRun;
     }
 
     protected override void FixedUpdate()
@@ -1011,7 +1014,7 @@ public class Player : Entity
         {
             if(isHitLedgeHead && isHitWallT == lookDir)
                 machine.ChangeState(stLedgeClimbHead);
-            else if(isHitLedgeBody && isHitWallT == lookDir)
+            else if(isHitLedgeBody && isHitWallB == lookDir)
                 machine.ChangeState(stLedgeClimbBody);
             else if(!isDetectedGround && inputData.yNegative == 0 && isHitWallB == lookDir && isHitWallT == lookDir)
                 machine.ChangeState(stIdleWall);
@@ -1079,7 +1082,7 @@ public class Player : Entity
         {
             if(isHitLedgeHead && isHitWallT == lookDir)
                 machine.ChangeState(stLedgeClimbHead);
-            else if(isHitLedgeBody && isHitWallT == lookDir)
+            else if(isHitLedgeBody && isHitWallB == lookDir)
                 machine.ChangeState(stLedgeClimbBody);
             else if(!isDetectedGround && inputData.yNegative == 0 && isHitWallB == lookDir && isHitWallT == lookDir)
                 machine.ChangeState(stIdleWall);
@@ -1379,7 +1382,7 @@ public class Player : Entity
         {
             if(isHitLedgeHead && isHitWallT == lookDir)
                 machine.ChangeState(stLedgeClimbHead);
-            else if(isHitLedgeBody && isHitWallT == lookDir)
+            else if(isHitLedgeBody && isHitWallB == lookDir)
                 machine.ChangeState(stLedgeClimbBody);
             else if(!isDetectedGround && inputData.yNegative == 0 && isHitWallB == lookDir && isHitWallT == lookDir)
                 machine.ChangeState(stIdleWall);
@@ -1551,7 +1554,7 @@ public class Player : Entity
         {
             if(isHitLedgeHead && isHitWallT == lookDir)
                 machine.ChangeState(stLedgeClimbHead);
-            else if(isHitLedgeBody && isHitWallT == lookDir)
+            else if(isHitLedgeBody && isHitWallB == lookDir)
                 machine.ChangeState(stLedgeClimbBody);
             else if(!isDetectedGround && inputData.yNegative == 0 && isHitWallB == lookDir && isHitWallT == lookDir)
                 machine.ChangeState(stIdleWall);
@@ -1600,7 +1603,7 @@ public class Player : Entity
         {
             if(isHitLedgeHead && isHitWallT == lookDir)
                 machine.ChangeState(stLedgeClimbHead);
-            else if(isHitLedgeBody && isHitWallT == lookDir)
+            else if(isHitLedgeBody && isHitWallB == lookDir)
                 machine.ChangeState(stLedgeClimbBody);
             else if(!isDetectedGround && inputData.yNegative == 0 && isHitWallB == lookDir && isHitWallT == lookDir)
                 machine.ChangeState(stIdleWall);
@@ -1743,7 +1746,7 @@ public class Player : Entity
             {
                 if(isHitLedgeHead && isHitWallT == lookDir)
                     machine.ChangeState(stLedgeClimbHead);
-                else if(isHitLedgeBody && isHitWallT == lookDir)
+                else if(isHitLedgeBody && isHitWallB == lookDir)
                     machine.ChangeState(stLedgeClimbBody);
                 else if(!isDetectedGround && inputData.yNegative == 0 && isHitWallB == lookDir && isHitWallT == lookDir)
                     machine.ChangeState(stIdleWall);
